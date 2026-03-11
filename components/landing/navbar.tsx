@@ -1,6 +1,7 @@
 'use client'
 
 import { ConnectButton } from '@rainbow-me/rainbowkit'
+import Link from 'next/link'
 
 export function Navbar() {
     return (
@@ -37,8 +38,12 @@ export function Navbar() {
                     {/* Desktop Links */}
                     <div className="hidden md:flex items-center gap-12 font-mono text-xs uppercase tracking-widest text-iron-grey">
                         <a href="#features" className="hover:text-bone-white transition-colors">Features</a>
-                        <a href="#quests" className="hover:text-bone-white transition-colors">Quests</a>
-                        <a href="#stats" className="hover:text-bone-white transition-colors">Data</a>
+                        <Link href="/quests" className="font-mono text-xs uppercase tracking-widest text-iron-grey hover:text-bone-white transition-colors">
+                            Quests
+                        </Link>
+                        <Link href="/leaderboard" className="font-mono text-xs uppercase tracking-widest text-iron-grey hover:text-bone-white transition-colors">
+                            Pantheon
+                        </Link>
                     </div>
 
                     {/* Connect Button */}

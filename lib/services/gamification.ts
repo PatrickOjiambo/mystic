@@ -27,7 +27,10 @@ export class GamificationService {
 
             // Legendary Legacy special case (OR condition)
             if (milestone.id === 'legendary-legacy') {
-                conditionsMet = depositedHuman >= 1000 || user.currentStreak >= 90
+                const top10Users = await User.find({}).sort({ xp: -1 }).limit(10).select('walletAddress').lean()
+                const isTop10 = top10Users.some((u: any) => u.walletAddress === walletAddress)
+
+                conditionsMet = depositedHuman >= 1000 || isTop10 || user.currentStreak >= 90
             } else {
                 // Standard AND conditions
                 if (milestone.conditions.minTotalDeposited && depositedHuman < milestone.conditions.minTotalDeposited) {
