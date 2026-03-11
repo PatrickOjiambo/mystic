@@ -4,416 +4,150 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* ===== MYSTIC RPG DESIGN SYSTEM ===== */
+/* ===== BRUTALIST MAGIC DESIGN SYSTEM ===== */
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter);
+  --font-serif: var(--font-cormorant);
   --font-mono: var(--font-mono);
-  --font-display: var(--font-cinzel);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
 
-  /* Mystic RPG Colors */
-  --color-mystic-purple: #7b3fe4;
-  --color-mystic-purple-light: #9d6ef0;
-  --color-mystic-purple-dark: #5a1fba;
-  --color-mystic-cyan: #00e5ff;
-  --color-mystic-cyan-light: #4df0ff;
-  --color-mystic-gold: #ffd700;
-  --color-mystic-gold-light: #ffe44d;
-  --color-mystic-crimson: #ff3366;
-  --color-mystic-emerald: #00ff88;
-  --color-mystic-deep: #0a0a1a;
-  --color-mystic-surface: #12122a;
-  --color-mystic-surface-light: #1a1a3e;
+  /* Brutalist Palette */
+  --color-void-black: #000000;
+  --color-bone-white: #eae3d9;
+  --color-blood-crimson: #d91616;
+  --color-tarnished-gold: #b8974a;
+  --color-ash-grey: #1a1a1a;
+  --color-iron-grey: #333333;
+
+  /* Reset radius for brutalism */
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
+  --radius-2xl: 0;
+  --radius-3xl: 0;
+  --radius-4xl: 0;
+  --radius: 0;
 }
 
 :root {
-  --background: #0a0a1a;
-  --foreground: #e8e6f0;
-  --card: #12122a;
-  --card-foreground: #e8e6f0;
-  --popover: #12122a;
-  --popover-foreground: #e8e6f0;
-  --primary: #7b3fe4;
-  --primary-foreground: #ffffff;
-  --secondary: #1a1a3e;
-  --secondary-foreground: #e8e6f0;
-  --muted: #1a1a3e;
-  --muted-foreground: #8888aa;
-  --accent: #00e5ff;
-  --accent-foreground: #0a0a1a;
-  --destructive: #ff3366;
-  --border: rgba(123, 63, 228, 0.2);
-  --input: rgba(123, 63, 228, 0.15);
-  --ring: #7b3fe4;
-  --chart-1: #7b3fe4;
-  --chart-2: #00e5ff;
-  --chart-3: #ffd700;
-  --chart-4: #ff3366;
-  --chart-5: #00ff88;
-  --radius: 0.625rem;
-  --sidebar: #0d0d20;
-  --sidebar-foreground: #e8e6f0;
-  --sidebar-primary: #7b3fe4;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #1a1a3e;
-  --sidebar-accent-foreground: #e8e6f0;
-  --sidebar-border: rgba(123, 63, 228, 0.2);
-  --sidebar-ring: #7b3fe4;
+  --background: #000000;
+  --foreground: #eae3d9;
 }
 
-/* Force dark mode — no light theme */
 .dark {
-  --background: #0a0a1a;
-  --foreground: #e8e6f0;
+  --background: #000000;
+  --foreground: #eae3d9;
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-iron-grey outline-none ring-0;
   }
+
   body {
-    @apply bg-background text-foreground;
-    background: var(--background);
+    @apply bg-void-black text-bone-white selection:bg-blood-crimson selection:text-bone-white;
   }
-  html {
-    scroll-behavior: smooth;
-  }
-}
 
-/* ===== ANIMATIONS ===== */
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
-}
-
-@keyframes float-slow {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  33% { transform: translateY(-15px) rotate(1deg); }
-  66% { transform: translateY(-8px) rotate(-1deg); }
-}
-
-@keyframes glow-pulse {
-  0%, 100% {
-    box-shadow: 0 0 20px rgba(123, 63, 228, 0.3),
-                0 0 40px rgba(123, 63, 228, 0.1);
-  }
-  50% {
-    box-shadow: 0 0 30px rgba(123, 63, 228, 0.5),
-                0 0 60px rgba(123, 63, 228, 0.2);
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-serif tracking-tight;
   }
 }
 
-@keyframes text-glow {
-  0%, 100% {
-    text-shadow: 0 0 10px rgba(123, 63, 228, 0.5),
-                 0 0 20px rgba(123, 63, 228, 0.3),
-                 0 0 40px rgba(123, 63, 228, 0.1);
-  }
-  50% {
-    text-shadow: 0 0 20px rgba(123, 63, 228, 0.8),
-                 0 0 40px rgba(123, 63, 228, 0.5),
-                 0 0 60px rgba(123, 63, 228, 0.2);
-  }
+/* ===== BRUTALIST UTILITIES ===== */
+
+.brutalist-border {
+  border: 1px solid var(--color-iron-grey);
 }
 
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+.brutalist-button {
+  @apply relative inline-flex items-center justify-center font-mono uppercase tracking-widest text-xs font-bold transition-all duration-200 border border-bone-white bg-void-black text-bone-white px-8 py-4 overflow-hidden z-10;
 }
 
-@keyframes particle-drift {
-  0% {
-    transform: translateY(0) translateX(0) scale(0);
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  90% {
-    opacity: 0.5;
-  }
-  100% {
-    transform: translateY(-100vh) translateX(50px) scale(0.5);
-    opacity: 0;
-  }
-}
-
-@keyframes grid-pulse {
-  0%, 100% { opacity: 0.03; }
-  50% { opacity: 0.08; }
-}
-
-@keyframes border-glow {
-  0%, 100% { border-color: rgba(123, 63, 228, 0.2); }
-  50% { border-color: rgba(123, 63, 228, 0.5); }
-}
-
-@keyframes count-up {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes orb-float {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-  }
-  25% {
-    transform: translate(30px, -40px) scale(1.1);
-  }
-  50% {
-    transform: translate(-20px, -60px) scale(0.95);
-  }
-  75% {
-    transform: translate(40px, -30px) scale(1.05);
-  }
-}
-
-/* ===== UTILITY CLASSES ===== */
-
-.glass-card {
-  background: rgba(18, 18, 42, 0.6);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(123, 63, 228, 0.15);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.glass-card:hover {
-  background: rgba(18, 18, 42, 0.8);
-  border-color: rgba(123, 63, 228, 0.4);
-  box-shadow: 0 0 30px rgba(123, 63, 228, 0.15),
-              0 20px 60px rgba(0, 0, 0, 0.3);
-  transform: translateY(-4px);
-}
-
-.glass-nav {
-  background: rgba(10, 10, 26, 0.8);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(123, 63, 228, 0.1);
-}
-
-.glow-text {
-  animation: text-glow 3s ease-in-out infinite;
-}
-
-.glow-border {
-  animation: glow-pulse 3s ease-in-out infinite;
-}
-
-.mystic-gradient {
-  background: linear-gradient(135deg, #7b3fe4, #00e5ff);
-}
-
-.mystic-gradient-text {
-  background: linear-gradient(135deg, #7b3fe4, #00e5ff, #ffd700);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.shimmer-bg {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(123, 63, 228, 0.05) 25%,
-    rgba(0, 229, 255, 0.05) 50%,
-    rgba(123, 63, 228, 0.05) 75%,
-    transparent 100%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 8s linear infinite;
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-.animate-float-slow {
-  animation: float-slow 8s ease-in-out infinite;
-}
-
-.animate-fade-in-up {
-  animation: fade-in-up 0.8s ease-out forwards;
-}
-
-.animate-orb {
-  animation: orb-float 12s ease-in-out infinite;
-}
-
-/* Particle background */
-.particle-container {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.particle {
-  position: absolute;
-  bottom: -10px;
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: rgba(123, 63, 228, 0.6);
-  animation: particle-drift linear infinite;
-}
-
-.particle:nth-child(odd) {
-  background: rgba(0, 229, 255, 0.4);
-}
-
-.particle:nth-child(3n) {
-  background: rgba(255, 215, 0, 0.3);
-  width: 2px;
-  height: 2px;
-}
-
-/* Grid overlay for hero background */
-.grid-overlay {
-  background-image:
-    linear-gradient(rgba(123, 63, 228, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(123, 63, 228, 0.05) 1px, transparent 1px);
-  background-size: 60px 60px;
-  animation: grid-pulse 4s ease-in-out infinite;
-}
-
-/* Quest path line */
-.quest-path-line {
-  background: linear-gradient(
-    to bottom,
-    rgba(123, 63, 228, 0.6),
-    rgba(0, 229, 255, 0.6),
-    rgba(255, 215, 0, 0.6)
-  );
-}
-
-.quest-node {
-  position: relative;
-}
-
-.quest-node::before {
+.brutalist-button::before {
   content: '';
   position: absolute;
-  inset: -4px;
-  border-radius: 50%;
-  background: conic-gradient(
-    from 0deg,
-    #7b3fe4,
-    #00e5ff,
-    #ffd700,
-    #7b3fe4
-  );
-  opacity: 0.5;
-  animation: spin 4s linear infinite;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-blood-crimson);
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: -1;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+.brutalist-button:hover::before {
+  transform: translateY(0);
 }
 
-/* Button styles */
-.btn-mystic-primary {
-  background: linear-gradient(135deg, #7b3fe4, #5a1fba);
-  color: white;
-  border: 1px solid rgba(123, 63, 228, 0.5);
-  box-shadow: 0 0 20px rgba(123, 63, 228, 0.3);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+.brutalist-button:hover {
+  @apply text-void-black border-blood-crimson;
 }
 
-.btn-mystic-primary:hover {
-  background: linear-gradient(135deg, #9d6ef0, #7b3fe4);
-  box-shadow: 0 0 30px rgba(123, 63, 228, 0.5),
-              0 0 60px rgba(123, 63, 228, 0.2);
-  transform: translateY(-2px);
+.brutalist-button-alt {
+  @apply relative inline-flex items-center justify-center font-mono uppercase tracking-widest text-xs font-bold transition-all duration-200 border border-tarnished-gold bg-tarnished-gold text-void-black px-8 py-4;
 }
 
-.btn-mystic-glass {
-  background: rgba(18, 18, 42, 0.4);
-  backdrop-filter: blur(10px);
-  color: #e8e6f0;
-  border: 1px solid rgba(123, 63, 228, 0.3);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+.brutalist-button-alt:hover {
+  @apply bg-bone-white border-bone-white;
 }
 
-.btn-mystic-glass:hover {
-  background: rgba(18, 18, 42, 0.7);
-  border-color: rgba(0, 229, 255, 0.5);
-  box-shadow: 0 0 20px rgba(0, 229, 255, 0.15);
-  transform: translateY(-2px);
+.brutalist-card {
+  @apply border border-iron-grey bg-void-black p-8 relative transition-colors duration-300;
 }
 
-/* Scrollbar styling */
+.brutalist-card:hover {
+  @apply border-bone-white bg-ash-grey;
+}
+
+.marquee-container {
+  overflow: hidden;
+  white-space: nowrap;
+  width: 100%;
+}
+
+.marquee-content {
+  display: inline-block;
+  animation: marquee 20s linear infinite;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #0a0a1a;
+  width: 8px;
+  background: var(--color-void-black);
+  border-left: 1px solid var(--color-iron-grey);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(123, 63, 228, 0.4);
-  border-radius: 3px;
+  background: var(--color-iron-grey);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(123, 63, 228, 0.6);
+  background: var(--color-bone-white);
 }
 
-/* Selection color */
-::selection {
-  background: rgba(123, 63, 228, 0.4);
-  color: #ffffff;
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0.04;
+  mix-blend-mode: overlay;
 }

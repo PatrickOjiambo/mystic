@@ -2,14 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react'
 
-interface StatCardProps {
-    label: string
-    value: number
-    prefix?: string
-    suffix?: string
-    color: string
-}
-
 function useCountUp(target: number, duration: number, shouldStart: boolean) {
     const [count, setCount] = useState(0)
 
@@ -23,7 +15,6 @@ function useCountUp(target: number, duration: number, shouldStart: boolean) {
             if (!startTime) startTime = timestamp
             const progress = Math.min((timestamp - startTime) / duration, 1)
 
-            // Ease out cubic
             const eased = 1 - Math.pow(1 - progress, 3)
             setCount(Math.floor(eased * target))
 
@@ -39,7 +30,7 @@ function useCountUp(target: number, duration: number, shouldStart: boolean) {
     return count
 }
 
-function StatCard({ label, value, prefix = '', suffix = '', color }: StatCardProps) {
+export function StatsSection() {
     const ref = useRef<HTMLDivElement>(null)
     const [isVisible, setIsVisible] = useState(false)
 
@@ -51,91 +42,65 @@ function StatCard({ label, value, prefix = '', suffix = '', color }: StatCardPro
                     observer.disconnect()
                 }
             },
-            { threshold: 0.3 },
+            { threshold: 0.1 },
         )
 
         if (ref.current) observer.observe(ref.current)
         return () => observer.disconnect()
     }, [])
 
-    const count = useCountUp(value, 2000, isVisible)
+    const tvl = useCountUp(124, 2000, isVisible)
+    const questers = useCountUp(8420, 2500, isVisible)
+    const apy = useCountUp(14, 1500, isVisible)
 
     return (
-        <div ref={ref} className="glass-card rounded-2xl p-8 text-center">
-            <div
-                className="mx-auto mb-4 h-1 w-12 rounded-full"
-                style={{ background: color }}
-            />
-            <p className="text-3xl font-bold text-foreground sm:text-4xl">
-                {prefix}
-                {count.toLocaleString()}
-                {suffix}
-            </p>
-            <p className="mt-2 text-sm font-medium text-muted-foreground">{label}</p>
-        </div>
-    )
-}
+        <section id="stats" className="bg-void-black border-b-8 border-tarnished-gold overflow-hidden">
+            <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32" ref={ref}>
 
-const stats = [
-    {
-        label: 'Total Value Locked',
-        value: 12400000,
-        prefix: '$',
-        color: '#7b3fe4',
-    },
-    {
-        label: 'Active Questers',
-        value: 8420,
-        color: '#00e5ff',
-    },
-    {
-        label: 'Quests Completed',
-        value: 142000,
-        color: '#ffd700',
-    },
-    {
-        label: 'Average APY',
-        value: 14,
-        suffix: '.2%',
-        color: '#00ff88',
-    },
-]
+                <h2 className="font-mono text-xs uppercase tracking-[0.3em] text-iron-grey mb-16 border-b border-iron-grey pb-4">
+                    Network Data Telemetry
+                </h2>
 
-export function StatsSection() {
-    return (
-        <section id="stats" className="relative py-24 sm:py-32">
-            {/* Background accent */}
-            <div className="absolute inset-0 shimmer-bg opacity-30" />
+                <div className="flex flex-col gap-24">
 
-            <div className="relative mx-auto max-w-7xl px-6">
-                {/* Section header */}
-                <div className="mx-auto max-w-2xl text-center">
-                    <span className="text-xs font-semibold uppercase tracking-widest text-mystic-gold">
-                        Protocol Stats
-                    </span>
-                    <h2 className="mt-4 font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
-                        The Numbers{' '}
-                        <span className="mystic-gradient-text">Speak</span>
-                    </h2>
-                    <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
-                        Real-time metrics from the Mystic protocol. Every quest completed adds to our
-                        collective adventure.
-                    </p>
+                    {/* Stat 1 */}
+                    <div className="relative group">
+                        <div className="flex flex-col md:flex-row md:items-end justify-between border-t border-iron-grey pt-8 group-hover:border-bone-white transition-colors duration-500">
+                            <span className="font-serif text-5xl md:text-7xl text-bone-white uppercase tracking-tighter mb-4 md:mb-0 group-hover:text-blood-crimson transition-colors z-10 w-full md:w-1/2">
+                                Total Value Locked.
+                            </span>
+                            <span className="font-serif text-8xl sm:text-[10rem] md:text-[12rem] text-iron-grey leading-none tracking-tighter w-full md:w-1/2 md:text-right group-hover:text-bone-white transition-colors">
+                                ${tvl}M
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Stat 2 */}
+                    <div className="relative group">
+                        <div className="flex flex-col md:flex-row md:items-end justify-between border-t border-iron-grey pt-8 group-hover:border-bone-white transition-colors duration-500">
+                            <span className="font-serif text-5xl md:text-7xl text-bone-white uppercase tracking-tighter mb-4 md:mb-0 group-hover:text-blood-crimson transition-colors z-10 w-full md:w-1/2">
+                                Active Operatives.
+                            </span>
+                            <span className="font-serif text-8xl sm:text-[10rem] md:text-[12rem] text-iron-grey leading-none tracking-tighter w-full md:w-1/2 md:text-right group-hover:text-bone-white transition-colors">
+                                {questers.toLocaleString()}
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Stat 3 */}
+                    <div className="relative group">
+                        <div className="flex flex-col md:flex-row md:items-end justify-between border-t border-iron-grey pt-8 group-hover:border-bone-white transition-colors duration-500">
+                            <span className="font-serif text-5xl md:text-7xl text-bone-white uppercase tracking-tighter mb-4 md:mb-0 group-hover:text-blood-crimson transition-colors z-10 w-full md:w-1/2">
+                                Average APY.
+                            </span>
+                            <span className="font-serif text-8xl sm:text-[10rem] md:text-[12rem] text-iron-grey leading-none tracking-tighter w-full md:w-1/2 md:text-right group-hover:text-tarnished-gold transition-colors">
+                                {apy}.2%
+                            </span>
+                        </div>
+                    </div>
+
                 </div>
 
-                {/* Stats grid */}
-                <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                    {stats.map((stat) => (
-                        <StatCard
-                            key={stat.label}
-                            label={stat.label}
-                            value={stat.value}
-                            prefix={stat.prefix}
-                            suffix={stat.suffix}
-                            color={stat.color}
-                        />
-                    ))}
-                </div>
             </div>
         </section>
     )

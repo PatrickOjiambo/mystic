@@ -1,18 +1,12 @@
 import type { Metadata } from 'next'
-import { Inter, Cinzel } from 'next/font/google'
-import { JetBrains_Mono } from 'next/font/google'
+import { Cormorant_Garamond, JetBrains_Mono } from 'next/font/google'
 import { Providers } from './providers'
 import './globals.css'
 
-const inter = Inter({
+const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
-  variable: '--font-inter',
-})
-
-const cinzel = Cinzel({
-  subsets: ['latin'],
-  variable: '--font-cinzel',
-  weight: ['400', '500', '600', '700', '800', '900'],
+  variable: '--font-cormorant',
+  weight: ['400', '500', '600', '700'],
 })
 
 const jetbrainsMono = JetBrains_Mono({
@@ -21,25 +15,8 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Mystic — The Duolingo of DeFi',
-  description:
-    'Transform passive crypto holding into an engaging RPG-style adventure. Level up your Yield Avatar through micro-deposits, daily quests, and community challenges — all powered by automated DeFi optimization.',
-  keywords: [
-    'DeFi',
-    'crypto',
-    'yield farming',
-    'gamification',
-    'micro-savings',
-    'Web3',
-    'RPG',
-    'blockchain',
-  ],
-  openGraph: {
-    title: 'Mystic — Your Quest for Yield Begins Here',
-    description:
-      'The Duolingo of DeFi. Gamified micro-savings with automated yield optimization on Ethereum, Base, and Arbitrum.',
-    type: 'website',
-  },
+  title: 'Mystic | Gamified DeFi',
+  description: 'Transform passive crypto holding into an engaging RPG-style adventure. Brutalist Magic.',
 }
 
 export default function RootLayout({
@@ -50,9 +27,19 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`dark ${inter.variable} ${cinzel.variable} ${jetbrainsMono.variable}`}
+      className={`dark ${cormorant.variable} ${jetbrainsMono.variable}`}
     >
-      <body className="min-h-screen bg-[#0a0a1a] font-sans text-foreground antialiased">
+      <body className="min-h-screen bg-void-black text-bone-white antialiased font-serif relative">
+        {/* CSS Noise Overlay */}
+        <div className="fixed inset-0 pointer-events-none z-50 opacity-[0.04] mix-blend-overlay">
+          <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <filter id="noiseFilter">
+              <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
+            </filter>
+            <rect width="100%" height="100%" filter="url(#noiseFilter)" />
+          </svg>
+        </div>
+
         <Providers>{children}</Providers>
       </body>
     </html>
