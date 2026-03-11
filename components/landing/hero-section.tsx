@@ -68,7 +68,7 @@ export function HeroSection() {
                         </p>
 
                         <div className="flex flex-col gap-4 items-start w-full">
-                            <a href="#quests" className="brutalist-button w-full">
+                            <a href="/terminal" className="brutalist-button w-full">
                                 [ ENGAGE PROTOCOL ]
                             </a>
                             <div className="flex w-full mt-4 border-t border-iron-grey pt-4">

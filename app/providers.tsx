@@ -3,6 +3,7 @@
 import { RainbowKitProvider, Theme } from '@rainbow-me/rainbowkit'
 import { WagmiProvider } from 'wagmi'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { YieldProvider } from '@yo-protocol/react'
 import { config } from '@/lib/wagmi'
 import '@rainbow-me/rainbowkit/styles.css'
 
@@ -73,9 +74,11 @@ export function Providers({ children }: ProvidersProps) {
     return (
         <WagmiProvider config={config}>
             <QueryClientProvider client={queryClient}>
-                <RainbowKitProvider theme={brutalistTheme}>
-                    {children}
-                </RainbowKitProvider>
+                <YieldProvider>
+                    <RainbowKitProvider theme={brutalistTheme}>
+                        {children}
+                    </RainbowKitProvider>
+                </YieldProvider>
             </QueryClientProvider>
         </WagmiProvider>
     )
