@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import connectToDatabase from '@/lib/mongoose'
 import { User } from '@/models/User'
 import { ActionLog } from '@/models/ActionLog'
+import { GamificationService } from '@/lib/services/gamification'
 
 export async function POST(req: Request) {
     try {
@@ -29,12 +30,8 @@ export async function POST(req: Request) {
         })
 
         // 2. Update user (create if doesn't exist)
-        // We add to totalDeposited only on DEPOSIT, not on REDEEM.
-        // Realistically you'd want precision math here (e.g., using viem/ethers),
-        // but for the sake of the base schema, we mock a simple string addition approach
-        // or rely on the frontend to pass formatted numbers for now.
-
         const user = await User.findOne({ walletAddress })
+        const now = new Date()
 
         if (!user) {
             // First time user, create profile
@@ -42,38 +39,38 @@ export async function POST(req: Request) {
                 walletAddress,
                 totalDeposited: actionType === 'DEPOSIT' ? amount : '0',
                 currentStreak: actionType === 'DEPOSIT' ? 1 : 0,
-                lastActiveDate: new Date(),
-                xp: actionType === 'DEPOSIT' ? 100 : 0,
+                lastActiveDate: now,
+                xp: actionType === 'DEPOSIT' ? 100 : 0, // Base XP for joining/depositing
+                unlockedMilestones: [],
+                totalQuizzesCompleted: 0,
+                referrals: 0
             })
         } else {
             // Existing user, update metrics
-            // Note: Safe BigInt math is needed for real production, string fallback here
             let newTotal = BigInt(user.totalDeposited)
             if (actionType === 'DEPOSIT') {
                 newTotal += BigInt(amount)
-                user.xp += 50 // 50 XP per deposit
+                user.xp += 50 // 50 XP base per deposit
             }
             user.totalDeposited = newTotal.toString()
 
-            // Simple streak logic: if active today, do nothing. If active yesterday, streak++. Otherwise, reset to 1.
-            const now = new Date()
-            const lastActive = user.lastActiveDate ? new Date(user.lastActiveDate) : new Date(0)
-
-            const isSameDay =
-                lastActive.getFullYear() === now.getFullYear() &&
-                lastActive.getMonth() === now.getMonth() &&
-                lastActive.getDate() === now.getDate()
-
-            if (!isSameDay && actionType === 'DEPOSIT') {
-                // Assume next day for now, we'll refine this in streaks module
-                user.currentStreak += 1
+            // Delegate streak calculation to GamificationService
+            if (actionType === 'DEPOSIT') {
+                const [newStreak, isNewDay] = GamificationService.applyStreakLogic(user.currentStreak, user.lastActiveDate)
+                user.currentStreak = newStreak
+                if (isNewDay) user.lastActiveDate = now
             }
 
-            user.lastActiveDate = now
             await user.save()
         }
 
-        return NextResponse.json({ success: true })
+        // 3. Evaluate Milestones (XP bonuses and Badges are applied here)
+        const newlyUnlocked = await GamificationService.evaluateUser(walletAddress)
+
+        return NextResponse.json({
+            success: true,
+            newMilestones: newlyUnlocked
+        })
     } catch (error: any) {
         console.error('Error syncing action:', error)
         return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 })

@@ -6,6 +6,9 @@ export interface IUser extends Document {
     currentStreak: number
     lastActiveDate: Date | null
     xp: number
+    unlockedMilestones: string[]
+    totalQuizzesCompleted: number
+    referrals: number
     createdAt: Date
     updatedAt: Date
 }
@@ -31,6 +34,18 @@ const UserSchema: Schema = new Schema(
             default: null,
         },
         xp: {
+            type: Number,
+            default: 0,
+        },
+        unlockedMilestones: {
+            type: [String],
+            default: [],
+        },
+        totalQuizzesCompleted: {
+            type: Number,
+            default: 0,
+        },
+        referrals: {
             type: Number,
             default: 0,
         },
