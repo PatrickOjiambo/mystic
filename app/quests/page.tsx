@@ -44,7 +44,7 @@ export default function QuestsPage() {
     const hasLegendary = gameState?.unlockedMilestones.includes('legendary-legacy')
     const hasEvolution = gameState?.unlockedMilestones.includes('spark-awakening')
 
-    let avatarImage = '/file.svg' // default basic
+    let avatarImage = '/starter.jpg' // default basic
     if (hasLegendary) avatarImage = '/legendary-yielding.jpg'
     else if (hasEvolution) avatarImage = '/evolution-initiate.jpg'
     else if (gameState && gameState.xp > 0) avatarImage = '/hatching-hero.jpg'
@@ -96,7 +96,7 @@ export default function QuestsPage() {
                             <div className="border border-iron-grey p-8 relative flex flex-col items-center group">
                                 <div className="absolute top-4 left-4 font-mono text-[10px] uppercase text-iron-grey">Avatar</div>
 
-                                <div className="w-48 h-48 border-2 border-iron-grey mb-6 relative overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-500">
+                                <div className="w-48 h-48 border-2 border-iron-grey mb-6 relative overflow-hidden">
                                     <Image
                                         src={avatarImage}
                                         alt="Yieldling Avatar"
@@ -152,14 +152,12 @@ export default function QuestsPage() {
                                             className={`flex items-start gap-4 p-4 border transition-colors ${isUnlocked ? 'border-tarnished-gold bg-tarnished-gold/5' : 'border-iron-grey opacity-50 grayscale'}`}
                                         >
                                             <div className="w-16 h-16 min-w-16 border border-iron-grey relative overflow-hidden bg-void-black">
-                                                {isUnlocked && (
-                                                    <Image
-                                                        src={milestone.imagePath}
-                                                        alt={milestone.name}
-                                                        fill
-                                                        className="object-cover"
-                                                    />
-                                                )}
+                                                <Image
+                                                    src={milestone.imagePath}
+                                                    alt={milestone.name}
+                                                    fill
+                                                    className="object-cover"
+                                                />
                                             </div>
                                             <div>
                                                 <h3 className={`font-serif text-xl leading-none uppercase ${isUnlocked ? 'text-tarnished-gold' : 'text-iron-grey'}`}>
