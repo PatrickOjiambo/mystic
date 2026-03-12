@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { useAccount } from 'wagmi'
-import Link from 'next/link'
-import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { LeaderboardEntry } from '@/app/api/leaderboard/route'
 import { Trophy, Star, Shield, HelpCircle } from 'lucide-react'
 
@@ -45,22 +43,7 @@ export default function LeaderboardPage() {
     }
 
     return (
-        <div className="min-h-screen bg-void-black text-bone-white selection:bg-blood-crimson relative flex flex-col pt-16 font-mono">
-            <div className="fixed inset-0 pointer-events-none z-50 opacity-[0.04] mix-blend-overlay">
-                <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-                    <filter id="noiseFilter">
-                        <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
-                    </filter>
-                    <rect width="100%" height="100%" filter="url(#noiseFilter)" />
-                </svg>
-            </div>
-
-            <header className="fixed top-0 w-full border-b border-iron-grey bg-void-black z-40 px-6 py-4 flex justify-between items-center">
-                <Link href="/" className="font-serif text-2xl font-bold tracking-tighter hover:text-blood-crimson transition-colors">
-                    MYSTIC :: GLOBAL
-                </Link>
-                <ConnectButton accountStatus="address" showBalance={false} />
-            </header>
+        <div className="flex-1 bg-void-black text-bone-white selection:bg-blood-crimson relative flex flex-col font-mono">
 
             <main className="flex-1 max-w-7xl mx-auto w-full px-6 py-24 pb-32">
                 <div className="mb-16 border-b border-iron-grey pb-8">

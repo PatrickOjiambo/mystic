@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Cormorant_Garamond, JetBrains_Mono } from 'next/font/google'
 import { Providers } from './providers'
+import { Navbar } from '@/components/landing/navbar'
 import './globals.css'
 
 const cormorant = Cormorant_Garamond({
@@ -29,7 +30,7 @@ export default function RootLayout({
       lang="en"
       className={`dark ${cormorant.variable} ${jetbrainsMono.variable}`}
     >
-      <body className="min-h-screen bg-void-black text-bone-white antialiased font-serif relative">
+      <body className="min-h-screen bg-void-black text-bone-white antialiased font-serif relative flex flex-col">
         {/* CSS Noise Overlay */}
         <div className="fixed inset-0 pointer-events-none z-50 opacity-[0.04] mix-blend-overlay">
           <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
@@ -40,7 +41,12 @@ export default function RootLayout({
           </svg>
         </div>
 
-        <Providers>{children}</Providers>
+        <Providers>
+          <Navbar />
+          <div className="flex-1 flex flex-col pt-4">
+            {children}
+          </div>
+        </Providers>
       </body>
     </html>
   )
