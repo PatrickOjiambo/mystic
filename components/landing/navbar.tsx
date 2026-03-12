@@ -43,6 +43,7 @@ export function Navbar() {
                     <div className="hidden md:flex items-center gap-8 lg:gap-12 font-mono text-xs uppercase tracking-widest text-iron-grey">
                         <Link href="/#features" className="hover:text-bone-white transition-colors">Features</Link>
                         <Link href="/terminal" className="hover:text-bone-white transition-colors">Terminal</Link>
+                        <Link href="/dashboard" className="hover:text-bone-white transition-colors">Dashboard</Link>
                         <Link href="/quests" className="hover:text-bone-white transition-colors">Quests</Link>
                         <Link href="/leaderboard" className="hover:text-bone-white transition-colors">Pantheon</Link>
                     </div>
@@ -72,6 +73,7 @@ export function Navbar() {
                     <div className="md:hidden border-t border-iron-grey bg-void-black flex flex-col font-mono text-sm uppercase tracking-widest text-iron-grey">
                         <Link href="/#features" className="p-4 border-b border-iron-grey/30 hover:bg-iron-grey/5 hover:text-bone-white transition-colors flex justify-between items-center" onClick={() => setIsOpen(false)}>Features <span>→</span></Link>
                         <Link href="/terminal" className="p-4 border-b border-iron-grey/30 hover:bg-iron-grey/5 hover:text-bone-white transition-colors flex justify-between items-center" onClick={() => setIsOpen(false)}>Terminal <span>→</span></Link>
+                        <Link href="/dashboard" className="p-4 border-b border-iron-grey/30 hover:bg-iron-grey/5 hover:text-bone-white transition-colors flex justify-between items-center" onClick={() => setIsOpen(false)}>Dashboard <span>→</span></Link>
                         <Link href="/quests" className="p-4 border-b border-iron-grey/30 hover:bg-iron-grey/5 hover:text-bone-white transition-colors flex justify-between items-center" onClick={() => setIsOpen(false)}>Quests <span>→</span></Link>
                         <Link href="/leaderboard" className="p-4 border-b border-iron-grey/30 hover:bg-iron-grey/5 hover:text-bone-white transition-colors flex justify-between items-center" onClick={() => setIsOpen(false)}>Pantheon <span>→</span></Link>
                         <div className="p-4 sm:hidden flex justify-center">

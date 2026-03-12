@@ -9,14 +9,14 @@ import {
     useApprove,
 } from '@yo-protocol/react'
 import { parseUnits, formatUnits } from 'viem'
-import { useAccount } from 'wagmi'
+import { useConnection } from 'wagmi'
 
 interface VaultInterfaceProps {
     vaultName: 'yoETH' | 'yoUSD'
 }
 
 export function VaultInterface({ vaultName }: VaultInterfaceProps) {
-    const { address } = useAccount()
+    const { address } = useConnection()
     const { vaultState, isLoading: isLoadingVault } = useVaultState(vaultName)
     const { position, isLoading: isLoadingBalance } = useUserPosition(vaultName, address)
 

@@ -1,12 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useAccount } from 'wagmi'
+import { useConnection } from 'wagmi'
 import { LeaderboardEntry } from '@/app/api/leaderboard/route'
 import { Trophy, Star, Shield, HelpCircle } from 'lucide-react'
 
 export default function LeaderboardPage() {
-    const { address, isConnected } = useAccount()
+    const { address, isConnected } = useConnection()
     const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([])
     const [loading, setLoading] = useState(true)
 

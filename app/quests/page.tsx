@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useAccount } from 'wagmi'
+import { useConnection } from 'wagmi'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import Link from 'next/link'
 import { UserGamificationState } from '@/lib/schemas/gamification'
@@ -9,7 +9,7 @@ import { MILESTONES } from '@/lib/constants/milestones'
 import Image from 'next/image'
 
 export default function QuestsPage() {
-    const { isConnected, address } = useAccount()
+    const { isConnected, address } = useConnection()
     const [gameState, setGameState] = useState<UserGamificationState | null>(null)
     const [loading, setLoading] = useState(true)
 

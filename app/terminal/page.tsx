@@ -1,11 +1,11 @@
 'use client'
 
-import { useAccount } from 'wagmi'
+import { useConnection } from 'wagmi'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { VaultInterface } from '@/components/terminal/vault-interface'
 
 export default function TerminalPage() {
-    const { isConnected, address } = useAccount()
+    const { isConnected, address } = useConnection()
 
     return (
         <div className="flex-1 bg-void-black text-bone-white selection:bg-blood-crimson relative flex flex-col">
@@ -24,7 +24,7 @@ export default function TerminalPage() {
                     <div className="border border-blood-crimson bg-blood-crimson/5 p-12 text-center flex flex-col items-center justify-center min-h-[40vh]">
                         <h2 className="font-serif text-4xl mb-6 uppercase tracking-tighter text-blood-crimson">Access Denied</h2>
                         <p className="font-mono text-sm text-bone-white/60 max-w-md mx-auto mb-8">
-                            Terminal operations require an active Web3 connection. Initialize context via cryptographic signature to proceed.
+                            Terminal operations require an active active wallet connection. Connect wallet to proceed.
                         </p>
                         <div className="scale-125">
                             <ConnectButton />
