@@ -5,12 +5,16 @@ import {
     useVaultState,
     useUserPosition,
     useDeposit,
-    useRedeem,
-    useApprove,
+    useRedeem
 } from '@yo-protocol/react'
-import { parseUnits, formatUnits } from 'viem'
-import { useConnection } from 'wagmi'
+import { parseUnits, formatUnits, erc20Abi } from 'viem'
+import { useConnection, useChainId, useSendTransaction, usePublicClient, useReadContract } from 'wagmi'
+import { VAULTS, YO_GATEWAY_ADDRESS } from "@yo-protocol/core";
+import { EnsoClient } from '@ensofinance/sdk';
 
+const ensoClient = new EnsoClient({
+    apiKey: process.env.NEXT_PUBLIC_ENSO_API_KEY || ''
+});
 interface VaultInterfaceProps {
     vaultName: 'yoETH' | 'yoUSD'
 }
@@ -22,15 +26,40 @@ export function VaultInterface({ vaultName }: VaultInterfaceProps) {
 
     const [amount, setAmount] = useState('')
     const [mode, setMode] = useState<'DEPOSIT' | 'REDEEM'>('DEPOSIT')
+    const [useNativeEth, setUseNativeEth] = useState(false)
+    const [isZapping, setIsZapping] = useState(false)
+    const { sendTransactionAsync } = useSendTransaction()
+    const publicClient = usePublicClient()
+    const chainId = useChainId();
 
     // YO Action Hooks
-    const { deposit, isLoading: isDepositing, isSuccess: isDepositSuccess } = useDeposit({ vault: vaultName })
+    const { deposit, isLoading: isDepositing, isSuccess: isDepositSuccess } = useDeposit({
+        vault: vaultName, slippageBps: 50,
+        onSubmitted: (h) => console.log("Deposit submitted:", h),
+        onConfirmed: (h) => console.log("Deposit confirmed:", h),
+        onError: (e) => console.error("Deposit error:", e),
+    })
     const { redeem, isLoading: isRedeeming, isSuccess: isRedeemSuccess } = useRedeem({ vault: vaultName })
 
-    const tokenAddress = vaultState?.asset || '0x'
-    const { approve, isLoading: isApproving, isSuccess: isApproveSuccess } = useApprove({ token: tokenAddress as `0x${string}` })
+    let tokenAddress;
+    if (vaultName === 'yoETH') {
+        tokenAddress = VAULTS.yoETH.underlying.address[chainId as keyof typeof VAULTS.yoETH.underlying.address];
+        console.log("Token addres", tokenAddress)
+        console.log("chain ID", chainId)
+        console.log("vault name", vaultName)
+        console.log("vault state", vaultState)
+    } else {
+        tokenAddress = VAULTS.yoUSD.underlying.address[chainId as keyof typeof VAULTS.yoUSD.underlying.address];
+    }
+    const { data: balanceData, isLoading: isCheckBalanceLoading, isError: isCheckBalanceError } = useReadContract({
+        address: tokenAddress as `0x${string}`,
+        abi: erc20Abi,
+        functionName: 'balanceOf',
+        args: address ? [address] : undefined,
+        query: { enabled: !!address && !!tokenAddress }
+    })
+    const balance = balanceData as bigint | undefined;
 
-    // Format balance helper
     const decimals = vaultName === 'yoETH' ? 18 : 6 // Assuming USDC is 6 decimals
     const displayBalance = position?.assets ? formatUnits(BigInt(position.assets), decimals) : '0.00'
 
@@ -61,16 +90,75 @@ export function VaultInterface({ vaultName }: VaultInterfaceProps) {
     }, [isDepositSuccess, isRedeemSuccess, address, amount, decimals, vaultName])
 
     // Handlers
-    const handleAction = () => {
-        if (!amount || parseFloat(amount) <= 0 || !tokenAddress) return
+    const handleAction = async () => {
+        if (!amount || parseFloat(amount) <= 0 || !tokenAddress || !address) return
 
         const parsedAmount = parseUnits(amount, decimals)
+        console.log("amount to buy", parsedAmount)
 
         if (mode === 'DEPOSIT') {
-            deposit({
-                token: tokenAddress as `0x${string}`,
-                amount: parsedAmount
-            })
+            if (vaultName === 'yoETH') {
+                console.log("WETH balance", balance)
+                console.log("isCheckBalanceLoading", isCheckBalanceLoading)
+                console.log("isCheckBalanceError", isCheckBalanceError)
+                if (isCheckBalanceLoading) {
+                    console.log("Loading WETH balance")
+                    return
+                }
+                //If user doesn't have enough WETH, convert some ETH to WETH using Enso
+                if (useNativeEth || (balance !== undefined && balance < parsedAmount)) {
+                    console.log("Converting ETH to WETH first")
+                    try {
+
+                        setIsZapping(true)
+                        const route = await ensoClient.getRouteData({
+                            chainId: chainId,
+                            fromAddress: address as `0x${string}`,
+                            receiver: address as `0x${string}`,
+                            spender: address as `0x${string}`,
+                            tokenIn: ["0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"],
+                            tokenOut: [tokenAddress as `0x${string}`],
+                            amountIn: [parsedAmount.toString()],
+                            routingStrategy: "router",
+                            slippage: "50"
+                        });
+
+                        const txHash = await sendTransactionAsync({
+                            to: route.tx.to as `0x${string}`,
+                            data: route.tx.data as `0x${string}`,
+                            value: BigInt(route.tx.value),
+                        });
+
+                        if (publicClient) {
+                            await publicClient.waitForTransactionReceipt({ hash: txHash });
+                        }
+
+                        deposit({
+                            token: tokenAddress as `0x${string}`,
+                            amount: parsedAmount,
+                            chainId: chainId
+                        })
+                    } catch (e) {
+                        console.error("Zapping error:", e);
+                        <p className="font-mono text-xs text-red-500 mt-2">Error: Error while converting some ETH to WETH</p>
+                    }
+                }
+                else {
+                    console.log("Direct deposit as WETH is enough")
+                    deposit({
+                        token: tokenAddress as `0x${string}`,
+                        amount: parsedAmount,
+                        chainId: chainId
+                    })
+                }
+            } else {
+                console.log("Not yoETH")
+                deposit({
+                    token: tokenAddress as `0x${string}`,
+                    amount: parsedAmount,
+                    chainId: chainId
+                })
+            }
         } else {
             // In a production app, we would use PreviewRedeem to get exact shares,
             // but passing parsedAmount directly as shares works for this layout
@@ -154,14 +242,30 @@ export function VaultInterface({ vaultName }: VaultInterfaceProps) {
                     </button>
                 </div>
 
+                {mode === 'DEPOSIT' && vaultName === 'yoETH' && (
+                    <div className="flex items-center gap-2 mt-2">
+                        <div
+                            className={`w-4 h-4 border border-iron-grey flex items-center justify-center cursor-pointer transition-colors ${useNativeEth ? 'bg-bone-white' : 'bg-void-black'}`}
+                            onClick={() => setUseNativeEth(!useNativeEth)}
+                        >
+                            {useNativeEth && <div className="w-2 h-2 bg-void-black"></div>}
+                        </div>
+                        <label className="font-mono text-[10px] text-iron-grey uppercase tracking-widest cursor-pointer hover:text-bone-white" onClick={() => setUseNativeEth(!useNativeEth)}>
+                            Zap with ETH via Enso
+                        </label>
+                    </div>
+                )}
+
                 <button
                     onClick={handleAction}
-                    disabled={isDepositing || isRedeeming || !amount}
+                    disabled={isDepositing || isRedeeming || isZapping || !amount}
                     className="brutalist-button w-full mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    {isDepositing || isRedeeming
-                        ? '[ EXECUTING... ]'
-                        : mode === 'DEPOSIT' ? '[ COMMIT CAPITAL ]' : '[ EXTRACT YIELD ]'
+                    {isZapping
+                        ? '[ ZAPPING ETH... ]'
+                        : isDepositing || isRedeeming
+                            ? '[ EXECUTING... ]'
+                            : mode === 'DEPOSIT' ? '[ COMMIT CAPITAL ]' : '[ EXTRACT YIELD ]'
                     }
                 </button>
 
