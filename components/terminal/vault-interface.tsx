@@ -28,18 +28,26 @@ export function VaultInterface({ vaultName }: VaultInterfaceProps) {
     const [mode, setMode] = useState<'DEPOSIT' | 'REDEEM'>('DEPOSIT')
     const [useNativeEth, setUseNativeEth] = useState(false)
     const [isZapping, setIsZapping] = useState(false)
+    const [txStep, setTxStep] = useState<string>('')
+    const [txError, setTxError] = useState<string>('')
     const { sendTransactionAsync } = useSendTransaction()
     const publicClient = usePublicClient()
     const chainId = useChainId();
 
     // YO Action Hooks
-    const { deposit, isLoading: isDepositing, isSuccess: isDepositSuccess } = useDeposit({
+    const { deposit, isLoading: isDepositing, isSuccess: isDepositSuccess, step: depositStep } = useDeposit({
         vault: vaultName, slippageBps: 50,
         onSubmitted: (h) => console.log("Deposit submitted:", h),
         onConfirmed: (h) => console.log("Deposit confirmed:", h),
-        onError: (e) => console.error("Deposit error:", e),
+        onError: (e) => {
+            console.error("Deposit error:", e)
+            setTxError(e.message || 'Deposit failed')
+        },
     })
-    const { redeem, isLoading: isRedeeming, isSuccess: isRedeemSuccess } = useRedeem({ vault: vaultName })
+    const { redeem, isLoading: isRedeeming, isSuccess: isRedeemSuccess, step: redeemStep } = useRedeem({ 
+        vault: vaultName,
+        onError: (e) => setTxError(e.message || 'Redeem failed')
+    })
 
     let tokenAddress;
     if (vaultName === 'yoETH') {
@@ -93,6 +101,8 @@ export function VaultInterface({ vaultName }: VaultInterfaceProps) {
     const handleAction = async () => {
         if (!amount || parseFloat(amount) <= 0 || !tokenAddress || !address) return
 
+        setTxError('')
+        setTxStep('')
         const parsedAmount = parseUnits(amount, decimals)
         console.log("amount to buy", parsedAmount)
 
@@ -109,8 +119,8 @@ export function VaultInterface({ vaultName }: VaultInterfaceProps) {
                 if (useNativeEth || (balance !== undefined && balance < parsedAmount)) {
                     console.log("Converting ETH to WETH first")
                     try {
-
                         setIsZapping(true)
+                        setTxStep('Fetching optimal route...')
                         const route = await ensoClient.getRouteData({
                             chainId: chainId,
                             fromAddress: address as `0x${string}`,
@@ -123,24 +133,29 @@ export function VaultInterface({ vaultName }: VaultInterfaceProps) {
                             slippage: "50"
                         });
 
+                        setTxStep('Awaiting wallet confirmation...')
                         const txHash = await sendTransactionAsync({
                             to: route.tx.to as `0x${string}`,
                             data: route.tx.data as `0x${string}`,
                             value: BigInt(route.tx.value),
                         });
 
+                        setTxStep('Converting ETH to WETH...')
                         if (publicClient) {
                             await publicClient.waitForTransactionReceipt({ hash: txHash });
                         }
 
+                        setTxStep('Preparing Deposit...')
                         deposit({
                             token: tokenAddress as `0x${string}`,
                             amount: parsedAmount,
                             chainId: chainId
                         })
+                        setIsZapping(false)
                     } catch (e) {
                         console.error("Zapping error:", e);
-                        <p className="font-mono text-xs text-red-500 mt-2">Error: Error while converting some ETH to WETH</p>
+                        setTxError('Error while converting some ETH to WETH')
+                        setIsZapping(false)
                     }
                 }
                 else {
@@ -164,6 +179,28 @@ export function VaultInterface({ vaultName }: VaultInterfaceProps) {
             // but passing parsedAmount directly as shares works for this layout
             redeem(parsedAmount)
         }
+    }
+
+    const getButtonText = () => {
+        if (isZapping) return `[ ${txStep.toUpperCase()} ]`;
+        if (isDepositing) {
+            switch (depositStep) {
+                case 'switching-chain': return '[ SWITCHING CHAIN... ]';
+                case 'approving': return '[ AWAITING APPROVAL... ]';
+                case 'depositing': return '[ AWAITING DEPOSIT SIGNATURE... ]';
+                case 'waiting': return '[ PROCESSING DEPOSIT... ]';
+                default: return '[ EXECUTING DEPOSIT... ]';
+            }
+        }
+        if (isRedeeming) {
+            switch (redeemStep) {
+                case 'approving': return '[ AWAITING APPROVAL... ]';
+                case 'redeeming': return '[ AWAITING REDEEM SIGNATURE... ]';
+                case 'waiting': return '[ PROCESSING REDEEM... ]';
+                default: return '[ EXECUTING REDEEM... ]';
+            }
+        }
+        return mode === 'DEPOSIT' ? '[ COMMIT CAPITAL ]' : '[ EXTRACT YIELD ]';
     }
 
     if (isLoadingVault) {
@@ -258,20 +295,16 @@ export function VaultInterface({ vaultName }: VaultInterfaceProps) {
 
                 <button
                     onClick={handleAction}
-                    disabled={isDepositing || isRedeeming || isZapping || !amount}
+                    disabled={isDepositing || isRedeeming || isZapping || (!amount && mode === 'DEPOSIT')}
                     className="brutalist-button w-full mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    {isZapping
-                        ? '[ ZAPPING ETH... ]'
-                        : isDepositing || isRedeeming
-                            ? '[ EXECUTING... ]'
-                            : mode === 'DEPOSIT' ? '[ COMMIT CAPITAL ]' : '[ EXTRACT YIELD ]'
-                    }
+                    {getButtonText()}
                 </button>
 
                 {/* Status Messages */}
-                {isDepositSuccess && <p className="font-mono text-xs text-[#00ff00] mt-2">Success: Capital deployed.</p>}
-                {isRedeemSuccess && <p className="font-mono text-xs text-[#00ff00] mt-2">Success: Capital extracted.</p>}
+                {isDepositSuccess && !isZapping && !isDepositing && <p className="font-mono text-xs text-[#00ff00] mt-2">Success: Capital deployed.</p>}
+                {isRedeemSuccess && !isRedeeming && <p className="font-mono text-xs text-[#00ff00] mt-2">Success: Capital extracted.</p>}
+                {txError && <p className="font-mono text-xs text-red-500 mt-2">{txError}</p>}
             </div>
         </div>
     )
