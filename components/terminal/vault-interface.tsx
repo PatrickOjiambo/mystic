@@ -33,7 +33,7 @@ export function VaultInterface({ vaultName }: VaultInterfaceProps) {
     const { sendTransactionAsync } = useSendTransaction()
     const publicClient = usePublicClient()
     const chainId = useChainId();
-
+let depositHash: string
     // YO Action Hooks
     const { deposit, isLoading: isDepositing, isSuccess: isDepositSuccess, step: depositStep } = useDeposit({
         vault: vaultName, slippageBps: 50,
@@ -85,7 +85,7 @@ export function VaultInterface({ vaultName }: VaultInterfaceProps) {
                         actionType: type,
                         amount: parseUnits(amount, decimals).toString(),
                         vault: vaultName,
-                        txHash: `mock-hash-${Date.now()}-${Math.random()}`
+                        txHash: depositHash
                     }),
                 })
             } catch (e) {
@@ -146,7 +146,7 @@ export function VaultInterface({ vaultName }: VaultInterfaceProps) {
                         }
 
                         setTxStep('Preparing Deposit...')
-                        deposit({
+                        depositHash = await deposit({
                             token: tokenAddress as `0x${string}`,
                             amount: parsedAmount,
                             chainId: chainId
@@ -160,7 +160,7 @@ export function VaultInterface({ vaultName }: VaultInterfaceProps) {
                 }
                 else {
                     console.log("Direct deposit as WETH is enough")
-                    deposit({
+                    depositHash = await deposit({
                         token: tokenAddress as `0x${string}`,
                         amount: parsedAmount,
                         chainId: chainId
@@ -168,7 +168,7 @@ export function VaultInterface({ vaultName }: VaultInterfaceProps) {
                 }
             } else {
                 console.log("Not yoETH")
-                deposit({
+                depositHash = await deposit({
                     token: tokenAddress as `0x${string}`,
                     amount: parsedAmount,
                     chainId: chainId
@@ -217,17 +217,17 @@ export function VaultInterface({ vaultName }: VaultInterfaceProps) {
             {/* Header */}
             <div className="flex justify-between items-end border-b border-iron-grey pb-4">
                 <div>
-                    <h2 className="font-serif text-4xl sm:text-5xl uppercase tracking-tighter text-bone-white group-hover:text-blood-crimson transition-colors">
+                    <h2 className="font-serif text-3xl sm:text-5xl uppercase tracking-tighter text-bone-white group-hover:text-blood-crimson transition-colors">
                         {vaultState?.name || vaultName}
                     </h2>
                     <div className="font-mono text-[10px] text-iron-grey uppercase tracking-widest mt-2 block">
-                        Contract: {tokenAddress.substring(0, 8)}...{tokenAddress.substring(tokenAddress.length - 6)}
+                        Contract: {tokenAddress.substring(0, 4)}...{tokenAddress.substring(tokenAddress.length - 4)}
                     </div>
                 </div>
                 <div className="text-right">
                     <div className="font-mono text-[10px] text-iron-grey uppercase tracking-widest mb-1">Your Balance</div>
                     <div className="font-mono text-xl sm:text-2xl text-bone-white">
-                        {isLoadingBalance ? '...' : displayBalance}
+                        {isLoadingBalance ? '...' : displayBalance.substring(0, 8)}
                     </div>
                 </div>
             </div>
@@ -241,7 +241,7 @@ export function VaultInterface({ vaultName }: VaultInterfaceProps) {
                 <div>
                     <div className="font-mono text-[10px] text-iron-grey uppercase tracking-widest mb-1">TVL</div>
                     <div className="font-mono text-xs text-bone-white">
-                        {vaultState?.totalAssets ? formatUnits(BigInt(vaultState.totalAssets), decimals) : '0.00'}
+                        {vaultState?.totalAssets ? formatUnits(BigInt(vaultState.totalAssets), decimals).substring(0, 8) : '0.00'}
                     </div>
                 </div>
             </div>
